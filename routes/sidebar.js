@@ -31,6 +31,62 @@ const routes = [
     ],
   },
   {
+    icon: "TruckIcon",
+    name: "Colors",
+    routes: [
+      {
+        path: "/app/all-colors",
+        name: "All Colors",
+      },
+      {
+        path: "/app/add-color",
+        name: "Add Color",
+      },
+    ],
+  },
+  {
+    icon: "TruckIcon",
+    name: "Brand",
+    routes: [
+      {
+        path: "/app/all-brand",
+        name: "All Brand",
+      },
+      {
+        path: "/app/add-brand",
+        name: "Add Brand",
+      },
+    ],
+  },
+  {
+    icon: "TruckIcon",
+    name: "Category",
+    routes: [
+      {
+        path: "/app/all-category",
+        name: "All Category",
+      },
+      {
+        path: "/app/add-category",
+        name: "Add Category",
+      },
+    ],
+  },
+  {
+    icon: "TruckIcon",
+    name: "SubCategory",
+    routes: [
+      {
+        path: "/app/all-subcategory",
+        name: "All SubCategory",
+      },
+      {
+        path: "/app/add-subcategory",
+        name: "Add SubCategory",
+      },
+    ],
+  },
+  {
     path: "/app/customers",
     icon: "GroupIcon",
     name: "Customers",
@@ -44,11 +100,6 @@ const routes = [
     path: "/app/manage-profile",
     icon: "UserIcon",
     name: "Profile",
-  },
-  {
-    path: "/app/settings",
-    icon: "OutlineCogIcon",
-    name: "Settings",
   },
   {
     path: "/app/logout",
