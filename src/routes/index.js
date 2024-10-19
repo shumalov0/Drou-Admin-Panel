@@ -6,6 +6,10 @@ const Orders = lazy(() => import("../pages/Orders"));
 const ProductsAll = lazy(() => import("../pages/ProductsAll"));
 const SingleProduct = lazy(() => import("../pages/SingleProduct"));
 const AddProduct = lazy(() => import("../pages/AddProduct"));
+const AddBrand = lazy(() => import("../pages/AddBrand"));
+const AddColor = lazy(() => import("../pages/AddColor"));
+const AddSubCategory = lazy(() => import("../pages/AddSubCategory"));
+const Addcategory = lazy(() => import("../pages/AddCategory"));
 const Customers = lazy(() => import("../pages/Customers"));
 const Chats = lazy(() => import("../pages/Chats"));
 const Profile = lazy(() => import("../pages/Profile"));
@@ -37,8 +41,24 @@ const routes = [
     component: ProductsAll,
   },
   {
+    path: "/add-color",
+    component: AddColor,
+  },
+  {
     path: "/add-product",
     component: AddProduct,
+  },
+  {
+    path: "/add-brand",
+    component: AddBrand,
+  },
+  {
+    path: "/add-subcategory",
+    component: AddSubCategory,
+  },
+  {
+    path: "/add-category",
+    component: Addcategory,
   },
   {
     path: "/product/:id",

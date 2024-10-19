@@ -1,15 +1,9 @@
-/**
- * ⚠ These are used just to render the Sidebar!
- * You can include any link here, local or external.
- *
- * If you're looking to actual Router routes, go to
- * `routes/index.js`
- */
+
 const routes = [
   {
-    path: "/app/dashboard", // the url
-    icon: "HomeIcon", // the component being exported from icons/index.js
-    name: "Dashboard", // name that appear in Sidebar
+    path: "/app/dashboard",
+    icon: "HomeIcon", 
+    name: "Dashboard",
   },
   {
     path: "/app/orders",
@@ -31,6 +25,58 @@ const routes = [
     ],
   },
   {
+    icon: "TruckIcon",
+    name: "Color",
+    routes: [
+      {
+        path: "/app/add-color",
+        name: "Add Color",
+      },
+    ],
+  },
+  {
+    icon: "TruckIcon",
+    name: "Brands",
+    routes: [
+      // {
+      //   path: "/app/all-products",
+      //   name: "All Produc",
+      // },
+      {
+        path: "/app/add-brand",
+        name: "Add Brands",
+      },
+    ],
+  },
+  {
+    icon: "TruckIcon",
+    name: "subcategory",
+    routes: [
+      // {
+      //   path: "/app/all-products",
+      //   name: "All Products",
+      // },
+      {
+        path: "/app/add-subcategory",
+        name: "Add subcategory",
+      },
+    ],
+  },
+  {
+    icon: "TruckIcon",
+    name: "category",
+    routes: [
+      // {
+      //   path: "/app/all-products",
+      //   name: "All Products",
+      // },
+      {
+        path: "/app/add-category",
+        name: "Add category",
+      },
+    ],
+  },
+  {
     path: "/app/customers",
     icon: "GroupIcon",
     name: "Customers",
@@ -45,11 +91,11 @@ const routes = [
     icon: "UserIcon",
     name: "Profile",
   },
-  {
-    path: "/app/settings",
-    icon: "OutlineCogIcon",
-    name: "Settings",
-  },
+  // {
+  //   path: "/app/settings",
+  //   icon: "OutlineCogIcon",
+  //   name: "Settings",
+  // },
   {
     path: "/app/logout",
     icon: "OutlineLogoutIcon",
