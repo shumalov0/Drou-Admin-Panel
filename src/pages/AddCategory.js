@@ -23,7 +23,7 @@ const AddCategory= () => {
     e.preventDefault();
 
     if (!categoryName.trim()) {
-      setMessage("Brand adı boş ola bilməz.");
+      setMessage("Category adı boş ola bilməz.");
       return;  
     }
 
@@ -37,13 +37,13 @@ const AddCategory= () => {
       
 
       if (response.data.success) {
-        setMessage("Brand created successfully!");
+        setMessage("Category created successfully!");
         setcategoryName(""); 
  
       }
     } catch (error) {
-      setMessage("Failed to create brand.");
-      console.error("Error creating brand:", error);
+      setMessage("Failed to create Category.");
+      console.error("Error creating Category:", error);
     }
   };
 
@@ -72,7 +72,7 @@ const AddCategory= () => {
               <Label>
                 <Input
                   className="mb-4"
-                  placeholder="Type Brand name here"
+                  placeholder="Type Category name here"
                   value={categoryName}
                   onChange={(e) => setcategoryName(e.target.value)}
                 />

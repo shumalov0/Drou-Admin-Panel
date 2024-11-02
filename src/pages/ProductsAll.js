@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import PageTitle from "../components/Typography/PageTitle";
 import { Link, NavLink } from "react-router-dom";
 import {
@@ -30,38 +31,53 @@ import {
   ModalBody,
   ModalFooter,
 } from "@windmill/react-ui";
-import response from "../utils/demo/productData";
 import Icon from "../components/Icon";
 import { genRating } from "../utils/genarateRating";
 
 const ProductsAll = () => {
   const [view, setView] = useState("grid");
 
-  // Table and grid data handlling
+  // Table and grid data handling
   const [page, setPage] = useState(1);
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true); // To show loading state
+  const [error, setError] = useState(null); // To handle errors
 
-  // pagination setup
+  // Pagination setup
   const [resultsPerPage, setResultsPerPage] = useState(10);
-  const totalResults = response.length;
+  const [totalResults, setTotalResults] = useState(0); // Set total results based on fetched data
 
-  // pagination change control
+  // Fetch products from the API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          `https://drou-electronics-store.onrender.com/api/v1/products?page=${page}&limit=${resultsPerPage}`
+        );
+        setData(response.data.data); // Assuming the API response contains data under `data.data`
+        setTotalResults(response.data.total); // Assuming the total count is in `response.data.total`
+      } catch (err) {
+        setError("Failed to fetch products");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [page, resultsPerPage]);
+
+  // Pagination change control
   function onPageChange(p) {
     setPage(p);
   }
 
-  // on page change, load new sliced data
-  // here you would make another server request for new data
-  useEffect(() => {
-    setData(response.slice((page - 1) * resultsPerPage, page * resultsPerPage));
-  }, [page, resultsPerPage]);
-
-  // Delete action model
+  // Delete action modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDeleteProduct, setSelectedDeleteProduct] = useState(null);
+
   async function openModal(productId) {
-    let product = await data.filter((product) => product.id === productId)[0];
-    // console.log(product);
+    let product = data.filter((product) => product.id === productId)[0];
     setSelectedDeleteProduct(product);
     setIsModalOpen(true);
   }
@@ -72,19 +88,17 @@ const ProductsAll = () => {
 
   // Handle list view
   const handleChangeView = () => {
-    if (view === "list") {
-      setView("grid");
-    }
-    if (view === "grid") {
-      setView("list");
-    }
+    setView(view === "list" ? "grid" : "list");
   };
+
+  if (loading) return <div>Loading products...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div>
       <PageTitle>All Products</PageTitle>
 
-      {/* Breadcum */}
+      {/* Breadcrumb */}
       <div className="flex text-gray-800 dark:text-gray-300">
         <div className="flex items-center text-purple-600">
           <Icon className="w-5 h-5" aria-hidden="true" icon={HomeIcon} />
@@ -96,7 +110,7 @@ const ProductsAll = () => {
         <p className="mx-2">All Products</p>
       </div>
 
-      {/* Sort */}
+      {/* Sort and Filter */}
       <Card className="mt-5 mb-5 shadow-md">
         <CardBody>
           <div className="flex items-center justify-between">
@@ -104,7 +118,6 @@ const ProductsAll = () => {
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 All Products
               </p>
-
               <Label className="mx-3">
                 <Select className="py-3">
                   <option>Sort by</option>
@@ -118,12 +131,11 @@ const ProductsAll = () => {
                   <option>Filter by Category</option>
                   <option>Electronics</option>
                   <option>Cloths</option>
-                  <option>Mobile Accerssories</option>
+                  <option>Mobile Accessories</option>
                 </Select>
               </Label>
 
               <Label className="mr-8">
-                {/* <!-- focus-within sets the color for the icon when input is focused --> */}
                 <div className="relative text-gray-500 focus-within:text-purple-600 dark:focus-within:text-purple-400">
                   <input
                     className="py-3 pr-5 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input"
@@ -132,13 +144,12 @@ const ProductsAll = () => {
                     onChange={(e) => setResultsPerPage(e.target.value)}
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center mr-3 pointer-events-none">
-                    {/* <SearchIcon className="w-5 h-5" aria-hidden="true" /> */}
                     Results on {`${view}`}
                   </div>
                 </div>
               </Label>
             </div>
-            <div className="">
+            <div>
               <Button
                 icon={view === "list" ? ListViewIcon : GridViewIcon}
                 className="p-2"
@@ -150,198 +161,128 @@ const ProductsAll = () => {
         </CardBody>
       </Card>
 
-      {/* Delete product model */}
+      {/* Delete product modal */}
       <Modal isOpen={isModalOpen} onClose={closeModal}>
         <ModalHeader className="flex items-center">
-          {/* <div className="flex items-center"> */}
           <Icon icon={TrashIcon} className="w-6 h-6 mr-3" />
           Delete Product
-          {/* </div> */}
         </ModalHeader>
         <ModalBody>
           Make sure you want to delete product{" "}
           {selectedDeleteProduct && `"${selectedDeleteProduct.name}"`}
         </ModalBody>
         <ModalFooter>
-          {/* I don't like this approach. Consider passing a prop to ModalFooter
-           * that if present, would duplicate the buttons in a way similar to this.
-           * Or, maybe find some way to pass something like size="large md:regular"
-           * to Button
-           */}
-          <div className="hidden sm:block">
-            <Button layout="outline" onClick={closeModal}>
-              Cancel
-            </Button>
-          </div>
-          <div className="hidden sm:block">
-            <Button>Delete</Button>
-          </div>
-          <div className="block w-full sm:hidden">
-            <Button block size="large" layout="outline" onClick={closeModal}>
-              Cancel
-            </Button>
-          </div>
-          <div className="block w-full sm:hidden">
-            <Button block size="large">
-              Delete
-            </Button>
-          </div>
+          <Button layout="outline" onClick={closeModal}>
+            Cancel
+          </Button>
+          <Button>Delete</Button>
         </ModalFooter>
       </Modal>
 
       {/* Product Views */}
       {view === "list" ? (
-        <>
-          <TableContainer className="mb-8">
-            <Table>
-              <TableHeader>
-                <tr>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Stock</TableCell>
-                  <TableCell>Rating</TableCell>
-                  <TableCell>QTY</TableCell>
-                  <TableCell>Price</TableCell>
-                  <TableCell>Action</TableCell>
-                </tr>
-              </TableHeader>
-              <TableBody>
-                {data.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell>
-                      <div className="flex items-center text-sm">
-                        <Avatar
-                          className="hidden mr-4 md:block"
-                          src={product.photo}
-                          alt="Product image"
-                        />
-                        <div>
-                          <p className="font-semibold">{product.name}</p>
-                        </div>
+        <TableContainer className="mb-8">
+          <Table>
+            <TableHeader>
+              <tr>
+                <TableCell>Name</TableCell>
+                <TableCell>Stock</TableCell>
+                <TableCell>Rating</TableCell>
+                <TableCell>QTY</TableCell>
+                <TableCell>Price</TableCell>
+                <TableCell>Action</TableCell>
+              </tr>
+            </TableHeader>
+            <TableBody>
+              {data.map((product) => (
+                <TableRow key={product.id}>
+                  <TableCell>
+                    <div className="flex items-center text-sm">
+                      <Avatar
+                        className="hidden mr-4 md:block"
+                        src={product.images}
+                        alt="Product image"
+                      />
+                      <div>
+                        <p className="font-semibold">{product.name}</p>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge type={product.qty > 0 ? "success" : "danger"}>
-                        {product.qty > 0 ? "In Stock" : "Out of Stock"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {genRating(product.rating, product.reviews.length, 5)}
-                    </TableCell>
-                    <TableCell className="text-sm">{product.qty}</TableCell>
-                    <TableCell className="text-sm">{product.price}</TableCell>
-                    <TableCell>
-                      <div className="flex">
-                        <Link to={`/app/product/${product.id}`}>
-                          <Button
-                            icon={EyeIcon}
-                            className="mr-3"
-                            aria-label="Preview"
-                          />
-                        </Link>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge type={product.qty > 0 ? "success" : "danger"}>
+                      {product.qty > 0 ? "In Stock" : "Out of Stock"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {genRating(product.rating, product.reviews.length, 5)}
+                  </TableCell>
+                  <TableCell className="text-sm">{product.qty}</TableCell>
+                  <TableCell className="text-sm">{product.price}</TableCell>
+                  <TableCell>
+                    <div className="flex">
+                      <Link to={`/app/product/${product.id}`}>
                         <Button
-                          icon={EditIcon}
+                          icon={EyeIcon}
                           className="mr-3"
-                          layout="outline"
-                          aria-label="Edit"
+                          aria-label="Preview"
                         />
-                        <Button
-                          icon={TrashIcon}
-                          layout="outline"
-                          onClick={() => openModal(product.id)}
-                          aria-label="Delete"
-                        />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <TableFooter>
-              <Pagination
-                totalResults={totalResults}
-                resultsPerPage={resultsPerPage}
-                label="Table navigation"
-                onChange={onPageChange}
-              />
-            </TableFooter>
-          </TableContainer>
-        </>
+                      </Link>
+                      <Button
+                        icon={EditIcon}
+                        className="mr-3"
+                        layout="outline"
+                        aria-label="Edit"
+                      />
+                      <Button
+                        icon={TrashIcon}
+                        layout="outline"
+                        onClick={() => openModal(product.id)}
+                        aria-label="Delete"
+                      />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <TableFooter>
+            <Pagination
+              totalResults={totalResults}
+              resultsPerPage={resultsPerPage}
+              label="Table navigation"
+              onChange={onPageChange}
+            />
+          </TableFooter>
+        </TableContainer>
       ) : (
-        <>
-          {/* Car list */}
-          <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-8">
-            {data.map((product) => (
-              <div className="" key={product.id}>
-                <Card>
-                  <img
-                    className="object-cover w-full"
-                    src={product.photo}
-                    alt="product"
-                  />
-                  <CardBody>
-                    <div className="mb-3 flex items-center justify-between">
-                      <p className="font-semibold truncate  text-gray-600 dark:text-gray-300">
-                        {product.name}
-                      </p>
-                      <Badge
-                        type={product.qty > 0 ? "success" : "danger"}
-                        className="whitespace-nowrap"
-                      >
-                        <p className="break-normal">
-                          {product.qty > 0 ? `In Stock` : "Out of Stock"}
-                        </p>
-                      </Badge>
-                    </div>
-
-                    <p className="mb-2 text-purple-500 font-bold text-lg">
-                      {product.price}
-                    </p>
-
-                    <p className="mb-8 text-gray-600 dark:text-gray-400">
-                      {product.shortDescription}
-                    </p>
-
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Link to={`/app/product/${product.id}`}>
-                          <Button
-                            icon={EyeIcon}
-                            className="mr-3"
-                            aria-label="Preview"
-                            size="small"
-                          />
-                        </Link>
-                      </div>
-                      <div>
-                        <Button
-                          icon={EditIcon}
-                          className="mr-3"
-                          layout="outline"
-                          aria-label="Edit"
-                          size="small"
-                        />
-                        <Button
-                          icon={TrashIcon}
-                          layout="outline"
-                          aria-label="Delete"
-                          onClick={() => openModal(product.id)}
-                          size="small"
-                        />
-                      </div>
-                    </div>
-                  </CardBody>
-                </Card>
-              </div>
-            ))}
-          </div>
-
-          <Pagination
-            totalResults={totalResults}
-            resultsPerPage={resultsPerPage}
-            label="Table navigation"
-            onChange={onPageChange}
-          />
-        </>
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-8">
+          {data.map((product) => (
+            <div className="h-[50px]" key={product.id}>
+              <Card>
+                <img
+                  className="object-cover w-full"
+                  src={product.images}
+                  alt="Product image"
+                />
+                <CardBody>
+                  <p className="mb-4 font-semibold">{product.name}</p>
+                  <Badge type={product.qty > 0 ? "success" : "danger"}>
+                    {product.qty > 0 ? "In Stock" : "Out of Stock"}
+                  </Badge>
+                  <p className="mt-4">${product.price}</p>
+                  <div className="mt-6 flex items-center justify-between">
+                    <Button block>
+                      <Link to={`/app/product/${product.id}`}>View</Link>
+                    </Button>
+                    <Button block layout="outline">
+                      Edit
+                    </Button>
+                  </div>
+                </CardBody>
+              </Card>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

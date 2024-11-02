@@ -81,11 +81,11 @@ const routes = [
     icon: "GroupIcon",
     name: "Customers",
   },
-  {
-    path: "/app/chats",
-    icon: "ChatIcon",
-    name: "Chats",
-  },
+  // {
+  //   path: "/app/chats",
+  //   icon: "ChatIcon",
+  //   name: "Chats",
+  // },
   {
     path: "/app/manage-profile",
     icon: "UserIcon",
